@@ -1,56 +1,58 @@
 #include <avr/io.h>
+#include <stdio.h>
 #include <util/delay.h>
 #include "prog.h"
 #include "uart.h"
 
+#define INPBUF_LEN 200
 
-void ADC_Init(void)
-{
-	// Set AVcc as Reference
-	ADMUX = (1<<REFS0);    
+void adc_init(void) {
+	ADMUX   = _BV(REFS0);              // Set AVcc as reference
+	ADCSRA  = _BV(ADPS2) | _BV(ADPS0); // Prescaler: 16MHz/32 = 500KHz
+	ADCSRA |= _BV(ADEN);               // ADC Enable
 
-	// Frequenzvorteiler
-	ADCSRA = (1<<ADPS1) | (1<<ADPS0);
-
-	// ADC Enable
-	ADCSRA |= (1<<ADEN);
-
-	// ADC Dummy readout
-	ADC_Read(0);
+	(void) adc_read(0); // Dummy read
 }
 
-uint16_t ADC_Read( uint8_t channel )
-{
-	// Select read channel
-	ADMUX = (ADMUX & ~(0x1F)) | (channel & 0x1F);
+uint16_t adc_read(uint8_t chan) {
+	ADMUX = (ADMUX & ~(0x1F)) | (chan & 0x1F); // Select read channel
+	ADCSRA |= _BV(ADSC);                       // Start conversion
 
-	// Set single conversion
-	ADCSRA |= (1<<ADSC);
-
-	// Wait for conversion
-	while (ADCSRA & (1<<ADSC) ) {}
-
-	// Read out
+	loop_until_bit_is_clear(ADCSRA, ADSC);     // Busy wait for completion
 	return ADCW;
 }
 
+uint16_t inpbuf[INPBUF_LEN];
 
-int main (void) {
-	// Init serial
+void recordInpbuf(uint8_t chan) {
+	// Read into inpbuf
+	for (uint8_t i=0; i<INPBUF_LEN; i++)
+		inpbuf[i] = adc_read(chan);
+
+	// Write inpbuf out
+	stdout = &uart_output;
+	for (uint8_t i=0; i<INPBUF_LEN; i++)
+		fprintf(stdout, "%i\n", inpbuf[i]);
+
+	puts("\n");
+}
+
+int main(void) {
+	// Initializations
 	uart_init();
 	stdout = &uart_output;
+	adc_init();
+
 	puts("Initialized!");
 
-	// Init port for blinking
-	DDRB |= (1 << PB5);
+	// XXX Time meassurement
+	DDRB |= _BV(PB5); // Set arduino LED pin 13 to output 
 
-	// Blink
 	while(1) {
-		PORTB ^= (1 << PB5);
-		uint16_t t = ADC_Read(0);
-		for (;t>0; t--) {
-			_delay_ms(50);
-		}
+		PORTB |= _BV(PB5);  // High
+		recordInpbuf(0);
+		PORTB &= ~_BV(PB5); // Low
+		_delay_ms(5000);
 	}
 
 	return 0;
