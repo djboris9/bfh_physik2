@@ -1,29 +1,34 @@
+# Variables
 TARGET=prog
-CC=avr-gcc
-OBJCOPY=avr-objcopy
-CFLAGS=-DF_CPU=16000000UL -mmcu=atmega328p -Os
+SOURCES=prog.c uart.c
+F_CPU=16000000UL
 PORT=/dev/ttyACM0
+MCU=atmega328p
+PROGRAMMER=arduino
+PART=m328p
 
-compile:
-	${CC} -mmcu=atmega328p -Os -c $(TARGET).c -o $(TARGET).o
+# Compiling and linking
+OBJECTS=$(SOURCES:.c=.o)
+CFLAGS += -DF_CPU=$(F_CPU) -mmcu=$(MCU) -Os -c
+LDFLAGS += -mmcu=$(MCU)
 
-link: $(TARGET).o
-	${CC} $(TARGET).o -o $(TARGET).elf
+.c.o:
+	avr-gcc $(CFLAGS) $< -o $@
 
-ihex: $(TARGET).elf
-	${OBJCOPY} -O ihex -j .text -j .data $(TARGET).elf $(TARGET).hex
+$(TARGET).elf: $(OBJECTS)
+	avr-gcc $(LDFLAGS) $(OBJECTS) -o $(TARGET).elf
 
-.PHONY: size
+$(TARGET).hex: $(TARGET).elf
+	avr-objcopy -O ihex -j .text -j .data $(TARGET).elf $(TARGET).hex
+
 size:
-	avr-size --mcu=atmega328p -C $(TARGET).elf 
+	avr-size --mcu=$(MCU) -C $(TARGET).elf 
 
-.PHONY: flash
 flash:
-	avrdude -p m328p -c arduino -P $(PORT) -U flash:w:$(TARGET).elf:a
+	avrdude -p $(PART) -c $(PROGRAMMER) -P $(PORT) -U flash:w:$(TARGET).hex:a
 
-.PHONY: clean
 clean:
-	rm -f $(TARGET).elf $(TARGET).o $(TARGET).hex
+	rm -f *.elf *.o *.hex
 
-.PHONY: all
-all: clean compile link ihex size flash
+.PHONY: all size flash clean
+all: clean $(TARGET).hex size flash
