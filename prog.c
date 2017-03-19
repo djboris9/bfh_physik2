@@ -7,9 +7,9 @@
 #define INPBUF_LEN 200
 
 void adc_init(void) {
-	ADMUX   = _BV(REFS0);              // Set AVcc as reference
-	ADCSRA  = _BV(ADPS2) | _BV(ADPS0); // Prescaler: 16MHz/32 = 500KHz
-	ADCSRA |= _BV(ADEN);               // ADC Enable
+	ADMUX   = _BV(REFS0); // Set AVcc as reference
+	ADCSRA  = _BV(ADPS2); // Prescaler: 16MHz/16 = 1 MHz
+	ADCSRA |= _BV(ADEN);  // ADC Enable
 
 	(void) adc_read(0); // Dummy read
 }
