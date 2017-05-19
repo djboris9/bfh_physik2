@@ -14,7 +14,7 @@ void adc_init(void) {
 	(void) adc_read(0); // Dummy read
 }
 
-uint16_t adc_read(uint8_t chan) {
+inline uint16_t adc_read(uint8_t chan) {
 	ADMUX = (ADMUX & ~(0x1F)) | (chan & 0x1F); // Select read channel
 	ADCSRA |= _BV(ADSC);                       // Start conversion
 
@@ -52,15 +52,26 @@ void recordInpbuf(uint8_t chan) {
 }
 
 #define BREAKOUT_LEVEL 600
+#define RESET_DISTMETER\
+	inp_0_ref = 0; \
+	inp_1_ref = 0; \
+	inp_2_ref = 0; \
+	inp_0_set = 0; \
+	inp_1_set = 0; \
+	inp_2_set = 0; \
+	timing = 0;
+
 
 void distMeter() {
-	uint16_t inp_0_ref = 0;
-	uint16_t inp_1_ref = 0;
-	uint16_t inp_2_ref = 0;
-	uint8_t inp_0_set = 0;
-	uint8_t inp_1_set = 0;
-	uint8_t inp_2_set = 0;
-	uint8_t timing = 0;
+	uint16_t inp_0_ref;
+	uint16_t inp_1_ref;
+	uint16_t inp_2_ref;
+	uint8_t inp_0_set;
+	uint8_t inp_1_set;
+	uint8_t inp_2_set;
+	uint8_t timing;
+
+	RESET_DISTMETER
 
 	for (;;) {
 		uint16_t inp_0 = adc_read(0);
@@ -70,8 +81,8 @@ void distMeter() {
 		if (inp_0 >= BREAKOUT_LEVEL && !inp_0_set) {
 			// inp_0 breakout
 			if (!timing) {
-				timer1_reset();
 				timing = 1;
+				timer1_reset();
 			}
 
 			inp_0_ref = timer1_get();
@@ -80,8 +91,8 @@ void distMeter() {
 		} else if (inp_1 >= BREAKOUT_LEVEL && !inp_1_set) {
 			// inp_1 breakout
 			if (!timing) {
-				timer1_reset();
 				timing = 1;
+				timer1_reset();
 			}
 
 			inp_1_ref = timer1_get();
@@ -89,8 +100,8 @@ void distMeter() {
 		} else if (inp_2 >= BREAKOUT_LEVEL && !inp_2_set) {
 			// inp_2 breakout
 			if (!timing) {
-				timer1_reset();
 				timing = 1;
+				timer1_reset();
 			}
 
 			inp_2_ref = timer1_get();
@@ -103,16 +114,11 @@ void distMeter() {
 			fprintf(stdout, "TimeDiffRaw: inp0=%i inp1=%i inp2=%i\n", inp_0_ref, inp_1_ref, inp_2_ref);
 
 			// Reset variables to default
-			inp_0_ref = 0;
-			inp_1_ref = 0;
-			inp_2_ref = 0;
-			inp_0_set = 0;
-			inp_1_set = 0;
-			inp_2_set = 0;
-			timing = 0;
+			RESET_DISTMETER
 
 			// Sleep for 2s
 			_delay_ms(2000);
+			fprintf(stdout, "Ready\n");
 		}
 	}
 }
@@ -126,7 +132,9 @@ int main(void) {
 
 	puts("Initialized!");
 
+	// Start distMeter
 	distMeter();
+	//recordInpbuf(0);
 
 	return 0;
 }
