@@ -1,0 +1,2 @@
+
+float arctanToDegree(float arc);

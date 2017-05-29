@@ -3,8 +3,7 @@
 #include <util/delay.h>
 #include "prog.h"
 #include "uart.h"
-
-#define INPBUF_LEN 200
+#include "arctan.h"
 
 /*
  * 0.343mm per microsecond (timing unit)
@@ -14,7 +13,7 @@ void adc_init(void) {
 	ADCSRA  = _BV(ADPS2); // Prescaler: 16MHz/16 = 1 MHz (= 1us)
 	ADCSRA |= _BV(ADEN);  // ADC Enable
 
-	(void) adc_read(0); // Dummy read
+	(void) adc_read(0);   // Dummy read
 }
 
 inline uint16_t adc_read(uint8_t chan) {
@@ -49,6 +48,39 @@ inline uint16_t timer1_get(void) {
 	inp_2_set = 0; \
 	timing = 0;
 
+float msToMM(uint16_t val) {
+ 	return val * 0.343 // Milimeter
+}
+
+/*
+ * alpha=tan-1(G/A)
+ */
+void printAngle(uint16_t inp0, uint16_t inp1, uint16_t inp2) {
+	float resAngle = 42;
+
+	// 90°
+	if (inp0 > inp1 && inp2 > inp1) {
+		resAngle = 90;
+	}	
+
+	// 90-180°
+	if (inp0 > inp1) {
+		float angleShort = arctanToDegree(msToMM(inp1)/80)
+		float angleLong = arctanToDegree(msToM;(inp0)/160)
+		resAngle = (angleShort+AngleLong)/2;
+	}
+
+	// 0-90°
+	if (inp2 > inp1) {
+		float angleShort = arctanToDegree(msToMM(inp1)/80)
+		float angleLong = arctanToDegree(msToMM(inp2)/160)
+		resAngle = (angleShort+AngleLong)/2;
+	}
+
+	// Print
+	stdout = &uart_output;
+	fprintf(stdout, "Result: %i\n", resAngle);
+}
 
 void distMeter(void) {
 	uint16_t inp_0_ref;
@@ -100,6 +132,9 @@ void distMeter(void) {
 			// Process and display result
 			stdout = &uart_output;
 			fprintf(stdout, "TimeDiffRaw: inp0=%i inp1=%i inp2=%i\n", inp_0_ref, inp_1_ref, inp_2_ref);
+
+			// Pretty result
+			printAngle(inp_0_ref, inp_1_ref, inp_2_ref);
 
 			// Reset variables to default
 			RESET_DISTMETER
