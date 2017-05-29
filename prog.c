@@ -6,9 +6,12 @@
 
 #define INPBUF_LEN 200
 
+/*
+ * 0.343mm per microsecond (timing unit)
+ */
 void adc_init(void) {
 	ADMUX   = _BV(REFS0); // Set AVcc as reference
-	ADCSRA  = _BV(ADPS2); // Prescaler: 16MHz/16 = 1 MHz
+	ADCSRA  = _BV(ADPS2); // Prescaler: 16MHz/16 = 1 MHz (= 1us)
 	ADCSRA |= _BV(ADEN);  // ADC Enable
 
 	(void) adc_read(0); // Dummy read
@@ -25,7 +28,7 @@ inline uint16_t adc_read(uint8_t chan) {
 // Initialize 16-Bit timer
 void timer1_init(void) {
 	TCCR1B = _BV(CS10); // Prescaler: 16MHz/1 = 16 MHz
-	TCNT1 = 0; // Initialize to zero
+	TCNT1 = 0;          // Initialize to zero
 }
 
 inline void timer1_reset(void) {
@@ -34,21 +37,6 @@ inline void timer1_reset(void) {
 
 inline uint16_t timer1_get(void) {
 	return TCNT1;
-}
-
-uint16_t inpbuf[INPBUF_LEN];
-
-void recordInpbuf(uint8_t chan) {
-	// Read into inpbuf
-	for (uint8_t i=0; i<INPBUF_LEN; i++)
-		inpbuf[i] = adc_read(chan);
-
-	// Write inpbuf out
-	stdout = &uart_output;
-	for (uint8_t i=0; i<INPBUF_LEN; i++)
-		fprintf(stdout, "%i\n", inpbuf[i]);
-
-	puts("\n");
 }
 
 #define BREAKOUT_LEVEL 600
@@ -62,7 +50,7 @@ void recordInpbuf(uint8_t chan) {
 	timing = 0;
 
 
-void distMeter() {
+void distMeter(void) {
 	uint16_t inp_0_ref;
 	uint16_t inp_1_ref;
 	uint16_t inp_2_ref;
@@ -134,7 +122,6 @@ int main(void) {
 
 	// Start distMeter
 	distMeter();
-	//recordInpbuf(0);
 
 	return 0;
 }
