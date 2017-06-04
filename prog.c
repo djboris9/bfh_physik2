@@ -49,7 +49,7 @@ inline uint16_t timer1_get(void) {
 	timing = 0;
 
 float msToMM(uint16_t val) {
- 	return val * 0.343 // Milimeter
+ 	return val * 0.343; // Milimeter
 }
 
 /*
@@ -65,16 +65,16 @@ void printAngle(uint16_t inp0, uint16_t inp1, uint16_t inp2) {
 
 	// 90-180°
 	if (inp0 > inp1) {
-		float angleShort = arctanToDegree(msToMM(inp1)/80)
-		float angleLong = arctanToDegree(msToM;(inp0)/160)
-		resAngle = (angleShort+AngleLong)/2;
+		float angleShort = arctanToDegree(msToMM(inp1)/75);
+		float angleLong = arctanToDegree(msToMM(inp0)/150);
+		resAngle = (angleShort+angleLong)/2;
 	}
 
 	// 0-90°
 	if (inp2 > inp1) {
-		float angleShort = arctanToDegree(msToMM(inp1)/80)
-		float angleLong = arctanToDegree(msToMM(inp2)/160)
-		resAngle = (angleShort+AngleLong)/2;
+		float angleShort = arctanToDegree(msToMM(inp1)/75);
+		float angleLong = arctanToDegree(msToMM(inp2)/150);
+		resAngle = (angleShort+angleLong)/2;
 	}
 
 	// Print
@@ -149,10 +149,10 @@ void distMeter(void) {
 int main(void) {
 	// Initializations
 	uart_init();
-	stdout = &uart_output;
 	adc_init();
 	timer1_init();
 
+	stdout = &uart_output;
 	puts("Initialized!");
 
 	// Start distMeter

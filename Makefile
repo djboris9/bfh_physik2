@@ -1,6 +1,6 @@
 # Variables
 TARGET=prog
-SOURCES=prog.c uart.c
+SOURCES=prog.c uart.c arctan.c
 F_CPU=16000000UL
 PORT=/dev/ttyACM0
 MCU=atmega328p
