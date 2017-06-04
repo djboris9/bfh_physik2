@@ -80,13 +80,12 @@ void printAngle(uint16_t inp0, uint16_t inp1, uint16_t inp2) {
 		resAngle = atan(inp0mm/150);
 	}
 
-	//double resAngle = (angleShort+angleLong)/2;
+//	resAngle = (angleShort+angleLong)/2;
+	resAngle = (360/(3*M_PI))*resAngle;
 
 	// Print
-	double x = inp2;
 	stdout = &uart_output;
 	fprintf(stdout, "Result: inp0mm=%f inp1mm=%f inp2mm=%f\n", inp0mm, inp1mm, inp2mm);
-	fprintf(stdout, "i=%i d=%f div=%f\n", inp2, x, x/10);
 	fprintf(stdout, "Result: %f\n", resAngle);
 }
 
