@@ -10,7 +10,7 @@ PART=m328p
 # Compiling and linking
 OBJECTS=$(SOURCES:.c=.o)
 CFLAGS += -DF_CPU=$(F_CPU) -mmcu=$(MCU) -Os -c
-LDFLAGS += -mmcu=$(MCU)
+LDFLAGS += -mmcu=$(MCU) -Wl,-u,vfprintf -lprintf_flt -lm
 
 .c.o:
 	avr-gcc $(CFLAGS) $< -o $@

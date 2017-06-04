@@ -48,38 +48,46 @@ inline uint16_t timer1_get(void) {
 	inp_2_set = 0; \
 	timing = 0;
 
-float msToMM(uint16_t val) {
- 	return val * 0.343; // Milimeter
+// Microseconds to milimeter
+double msToMM(double val) {
+	return val / 41;
 }
 
 /*
  * alpha=tan-1(G/A)
  */
 void printAngle(uint16_t inp0, uint16_t inp1, uint16_t inp2) {
-	float resAngle = 42;
+	double angleShort, angleLong, resAngle;
 
-	// 90°
-	if (inp0 > inp1 && inp2 > inp1) {
-		resAngle = 90;
-	}	
+	double inp0mm = msToMM(inp0);
+	double inp1mm = msToMM(inp1);
+	double inp2mm = msToMM(inp2);
 
-	// 90-180°
-	if (inp0 > inp1) {
-		float angleShort = atan(msToMM(inp1)/75);
-		float angleLong = atan(msToMM(inp0)/150);
-		resAngle = (angleShort+angleLong)/2;
+	if (inp1 < 10) {
+		angleShort = 42;
+		angleLong = 42;
+
+		resAngle = 42;
+	} else if (inp0 < 10) {
+		angleShort = atan(inp1mm/75);
+		angleLong = atan(inp2mm/150);
+
+		resAngle = atan(inp2mm/150);
+	} else if (inp2 < 10) {
+		angleShort = atan(inp1mm/75);
+		angleLong = atan(inp0mm/150);
+
+		resAngle = atan(inp0mm/150);
 	}
 
-	// 0-90°
-	if (inp2 > inp1) {
-		float angleShort = atan(msToMM(inp1)/75);
-		float angleLong = atan(msToMM(inp2)/150);
-		resAngle = (angleShort+angleLong)/2;
-	}
+	//double resAngle = (angleShort+angleLong)/2;
 
 	// Print
+	double x = inp2;
 	stdout = &uart_output;
-	fprintf(stdout, "Result: %i\n", resAngle);
+	fprintf(stdout, "Result: inp0mm=%f inp1mm=%f inp2mm=%f\n", inp0mm, inp1mm, inp2mm);
+	fprintf(stdout, "i=%i d=%f div=%f\n", inp2, x, x/10);
+	fprintf(stdout, "Result: %f\n", resAngle);
 }
 
 void distMeter(void) {
