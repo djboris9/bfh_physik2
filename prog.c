@@ -1,9 +1,9 @@
 #include <avr/io.h>
 #include <stdio.h>
 #include <util/delay.h>
+#include <math.h>
 #include "prog.h"
 #include "uart.h"
-#include "arctan.h"
 
 /*
  * 0.343mm per microsecond (timing unit)
@@ -65,15 +65,15 @@ void printAngle(uint16_t inp0, uint16_t inp1, uint16_t inp2) {
 
 	// 90-180°
 	if (inp0 > inp1) {
-		float angleShort = arctanToDegree(msToMM(inp1)/75);
-		float angleLong = arctanToDegree(msToMM(inp0)/150);
+		float angleShort = atan(msToMM(inp1)/75);
+		float angleLong = atan(msToMM(inp0)/150);
 		resAngle = (angleShort+angleLong)/2;
 	}
 
 	// 0-90°
 	if (inp2 > inp1) {
-		float angleShort = arctanToDegree(msToMM(inp1)/75);
-		float angleLong = arctanToDegree(msToMM(inp2)/150);
+		float angleShort = atan(msToMM(inp1)/75);
+		float angleLong = atan(msToMM(inp2)/150);
 		resAngle = (angleShort+angleLong)/2;
 	}
 
