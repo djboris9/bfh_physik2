@@ -53,9 +53,6 @@ double msToMM(double val) {
 	return val / 41;
 }
 
-/*
- * alpha=tan-1(G/A)
- */
 void printAngle(uint16_t inp0, uint16_t inp1, uint16_t inp2) {
 	double angleShort, angleLong, resAngle;
 
@@ -80,12 +77,12 @@ void printAngle(uint16_t inp0, uint16_t inp1, uint16_t inp2) {
 		resAngle = atan(inp0mm/150);
 	}
 
-//	resAngle = (angleShort+angleLong)/2;
+	resAngle = (angleShort+angleLong)/2;
 	resAngle = (360/(3*M_PI))*resAngle;
 
 	// Print
 	stdout = &uart_output;
-	fprintf(stdout, "Result: inp0mm=%f inp1mm=%f inp2mm=%f\n", inp0mm, inp1mm, inp2mm);
+//	fprintf(stdout, "Result: inp0mm=%f inp1mm=%f inp2mm=%f\n", inp0mm, inp1mm, inp2mm);
 	fprintf(stdout, "Result: %f\n", resAngle);
 }
 
