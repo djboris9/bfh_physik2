@@ -71,4 +71,4 @@ Als Schnittstelle zwischen dem ATmega und weiterer Peripherie wählte ich UART, 
 # Hinweise
 Der Quellcode inkl. die Dokumentation befindet sich auf [github.com/djboris9/bfh_physik2](https://github.com/djboris9/bfh_physik2)
 
-PDF generiert mit `pandoc  README.md -o readme.pdf -V geometry:margin=1in`
+PDF generiert mit `pandoc  README.md -o readme.pdf -V geometry:margin=1in`, nachbearbeitet mit `gs -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dPDFSETTINGS=/prepress -dNOPAUSE -dQUIET -dBATCH -sOutputFile=final.pdf readme.pdf`
