@@ -5,6 +5,8 @@ Eine Tonquelle im 2D Raum lokalisieren können.
 ## Methode
 Drei Mikrofone in einer Reihe erkennen nacheinander den Amplitudenanstieg und messen die Zeitdifferenz zwischen ihnen. Die beiden Winkel von den letzten erreichten Mikrofonen zum ersten Mikrofon werden als Mittelwert gerechnet, um die Präzision zu erhöhen.
 
+![Zeichnung](img/geogebra.png)
+
 ## Realisierung
 ### Hardware
 Ich entschied mich Mikrofonkapseln des Typs MCE-101 zu kaufen und die Verstärkerschaltung selber mithilfe eines Verstärker ICs zu realisieren.
@@ -32,8 +34,8 @@ Nach der Fertigstellung und der Verdrahtung mit dem Arduino sieht der Aufbau wie
 ![DSC_0023.JPG](img/DSC_0023.JPG)
 
 ### Software
-Die Arduino Bibliotheken stellen m.E. eine Abstraktonsschicht mit unbekannten Nebeneffekten da,
-welche ich insbesondere für solche Zeitmessungen vermeiden will. Deshalb entschied ich mich die Software in C mit der Atmel avr-libc zu entwickeln.
+Die Arduino Bibliotheken stellen m.E. eine Abstraktionsschicht mit unbekannten Nebeneffekten da,
+welche ich insbesondere für solche Zeitmessungen vermeiden will. Deshalb entschied ich mich die Software in C mit Unterstützung der Atmel avr-libc zu entwickeln.
 
 #### Entwicklungsumgebung
 * Compiler: `avr-gcc (GCC) 7.1.0`
@@ -42,20 +44,20 @@ welche ich insbesondere für solche Zeitmessungen vermeiden will. Deshalb entsch
 * Programmer: `avrdude version 6.3`
 
 #### Prescaler
-Da der Analog-Digital-Converter des ATmega328p eine maximale Auflösung von 10 Bit bei einer `input clock frequency between 50kHz and 200kHz` hat, und ich diese überziehen will, liess ich 200 Sampels mit einer Clock Frequency von 1MHz (Prescaler: 16) aufnehmen und plottete es aus:
+Da der Analog-Digital-Converter des ATmega328p eine maximale Auflösung von 10 Bit bei einer Timerfrequenz zwischen 50kHz und 200kHz hat und ich diese aufgrund einer schnelleren Abtastrate überziehen will, liess ich 200 Sampels mit einer Clock Frequency von 1MHz (Prescaler auf /16) aufnehmen und plottete es aus:
 
 ![Prescaler Test](img/prescaler_test.png)
 
-Da dies für mich noch immer genug präzis ist, ging ich weiter an die Implementierung.
+Da die Genauigkeit dieser Kurve für meinen Einsatzzweck stimmt, ging ich weiter an die Implementierung.
 
 #### Zeitmessung
-In einem Loop prüfe ich, ob der analoge Wert irgendeines Mikrofones auf über 600 ansteigt (`BREAKOUT_LEVEL`). Falls dies zutrifft setze ich den 16-Bit Timer auf 0 und fahre mit dem Loop fort, wobei ich beim erreichen des breakout levels für die anderen beiden Mikrofone den Timerwert in einer Variable speichere. Erreichten alle Mikrofone mal diesen Wert, werte ich das Ergebnis aus und warte zwei Sekunden, bis die Routine von vorne beginnt.
+In einem Loop prüfe ich, ob der analoge Wert irgendeines Mikrofones auf über 600 ansteigt (`BREAKOUT_LEVEL`). Falls dies zutrifft setze ich den 16-Bit Timer auf 0 und fahre mit dem Loop fort, wobei ich beim Erreichen des breakout levels für die anderen beiden Mikrofone den Timerwert in einer Variable speichere. Erreichten alle Mikrofone mal diesen Wert, werte ich das Ergebnis aus und warte zwei Sekunden, bis die Routine von vorne beginnt.
 
 #### Positionsbestimmung
 Für die Positionsbestimmung bestimme ich mit hilfe des Tangens und einer Zeit-Zu-Distanz Funktion den Winkel vom zuletzt erreichten Mikrofon zum ersten (150mm Hypotenuse), sowie vom dazwischenliegenden zum ersten (75mm Hypotenuse). Den Mittelwert betrachte ich als Ergebnis und schicke es über UART im Gradmass weiter.
 
 #### Serielle Kommunikation
-Als Schnittstelle zwischen dem ATmega und weiterer Peripherie wählte ich UART, da es aufgrund der Arduino Architektur über USB als serielle Schnittstelle (`USB ACM device`) erkannt wird. Die Schnittstelle wird nur sendend auf 9600 baud verwendet, wobei zum Senden auf die `stdio` von avr-libc zurückgegriffen wird.
+Als Schnittstelle zwischen dem ATmega und weiterer Peripherie wählte ich UART, da es aufgrund der Arduino Architektur über USB als serielle Schnittstelle (`USB ACM device`) erkannt wird. Die Schnittstelle wird nur sendend mit 9600 Baud verwendet, wobei zum Senden auf die `stdio` von avr-libc zurückgegriffen wird.
 
 # Literatur
 - LM-386 Verstärker http://www.ti.com/lit/ds/symlink/lm386.pdf
