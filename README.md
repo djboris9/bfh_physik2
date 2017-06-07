@@ -13,16 +13,20 @@ Ich entschied mich Mikrofonkapseln des Typs MCE-101 zu kaufen und die Verstärke
 Aufgrund der mir passenden Merkmale (Spannung, Verstärkung) sowie der Erhältlichkeit im DIP Format, wählte ich den LM386 IC von Texas Instruments.
 Die Grundschaltung ist einfach aufzubauen und erfordert nicht allzu viele weitere Bauteile.
 Somit zeichnete ich das folgende Schema, welches ich in dreifacher Ausführung auf einer Lochplatine mit den Bauelementen lötete.
+
 ![Schema](img/schema.png)
 
 Hinweis: Das Schema ist als KiCAD Projekt im Verzeichnis `soundtracker/` hinterlegt.
 
 Nach einem Check mit dem Oszilloskop nahm ich alle drei Verstärkerschaltungen und baute diese wie einen Turm aufeinander. Die Mikrofone befestigte ich in einer Holzleiste.
-![Checkaufbau](img/oszi_schema.jpg)
+
+![Anschluss des Prototyps am Oszilloskop](img/oszi_schema.jpg)
+
 Man beachte die Amplitudenverschiebung.
 
-![Check](img/oszi.png)
-![Aufbau](img/aufbau.jpg)
+![Oszilloskop](img/oszi.png)
+
+![Zusammenbau der Platinen](img/aufbau.jpg)
 
 Nach der Fertigstellung und der Verdrahtung mit dem Arduino sieht der Aufbau wie folgt aus:
 
@@ -60,6 +64,11 @@ Für die Positionsbestimmung bestimme ich mit hilfe des Tangens und einer Zeit-Z
 Als Schnittstelle zwischen dem ATmega und weiterer Peripherie wählte ich UART, da es aufgrund der Arduino Architektur über USB als serielle Schnittstelle (`USB ACM device`) erkannt wird. Die Schnittstelle wird nur sendend mit 9600 Baud verwendet, wobei zum Senden auf die `stdio` von avr-libc zurückgegriffen wird.
 
 # Literatur
-- LM-386 Verstärker http://www.ti.com/lit/ds/symlink/lm386.pdf
-- AVR libC http://www.atmel.com/webdoc/avrlibcreferencemanual/group__avr__sfr_1gaaf6857fa882da35f8685e2001e5c3bbe.html
-- ATmega328p http://www.atmel.com/images/Atmel-8271-8-bit-AVR-Microcontroller-ATmega48A-48PA-88A-88PA-168A-168PA-328-328P_datasheet_Complete.pdf
+- LM-386 Verstärker [www.ti.com](http://www.ti.com/lit/ds/symlink/lm386.pdf)
+- AVR libC [www.atmel.com](http://www.atmel.com/webdoc/avrlibcreferencemanual/group__avr__sfr_1gaaf6857fa882da35f8685e2001e5c3bbe.html)
+- ATmega328p [www.atmel.com](http://www.atmel.com/images/Atmel-8271-8-bit-AVR-Microcontroller-ATmega48A-48PA-88A-88PA-168A-168PA-328-328P_datasheet_Complete.pdf)
+
+# Hinweise
+Der Quellcode inkl. die Dokumentation befindet sich auf [github.com/djboris9/bfh_physik2](https://github.com/djboris9/bfh_physik2)
+
+PDF generiert mit `pandoc  README.md -o readme.pdf -V geometry:margin=1in`
