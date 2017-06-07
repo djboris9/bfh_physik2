@@ -44,18 +44,18 @@ welche ich insbesondere für solche Zeitmessungen vermeiden will. Deshalb entsch
 #### Prescaler
 Da der Analog-Digital-Converter des ATmega328p eine maximale Auflösung von 10 Bit bei einer `input clock frequency between 50kHz and 200kHz` hat, und ich diese überziehen will, liess ich 200 Sampels mit einer Clock Frequency von 1MHz (Prescaler: 16) aufnehmen und plottete es aus:
 
-% TODO
+![Prescaler Test](img/prescaler_test.png)
 
 Da dies für mich noch immer genug präzis ist, ging ich weiter an die Implementierung.
 
 #### Zeitmessung
-In einem Loop prüfe ich, ob der analoge Wert irgendeines Mikrofones auf über 600 ansteigt (`BREAKOUT_LEVEL`). Falls dies zutrifft setze ich den 16-Bit Timer auf 0 und fahre mit dem Loop fort, wobei ich beim erreichen des breakout levels für die anderen beiden Mikrofone den Timerwert in einer Variable speichere. Erreichten alle Mikrofone mal diesen Wert, werte ich das Ergebnis aus, schicke es über UART weiter und warte zwei Sekunden, bis die Routine von vorne beginnt.
+In einem Loop prüfe ich, ob der analoge Wert irgendeines Mikrofones auf über 600 ansteigt (`BREAKOUT_LEVEL`). Falls dies zutrifft setze ich den 16-Bit Timer auf 0 und fahre mit dem Loop fort, wobei ich beim erreichen des breakout levels für die anderen beiden Mikrofone den Timerwert in einer Variable speichere. Erreichten alle Mikrofone mal diesen Wert, werte ich das Ergebnis aus und warte zwei Sekunden, bis die Routine von vorne beginnt.
+
+#### Positionsbestimmung
+Für die Positionsbestimmung bestimme ich mit hilfe des Tangens und einer Zeit-Zu-Distanz Funktion den Winkel vom zuletzt erreichten Mikrofon zum ersten (150mm Hypotenuse), sowie vom dazwischenliegenden zum ersten (75mm Hypotenuse). Den Mittelwert betrachte ich als Ergebnis und schicke es über UART im Gradmass weiter.
 
 #### Serielle Kommunikation
 Als Schnittstelle zwischen dem ATmega und weiterer Peripherie wählte ich UART, da es aufgrund der Arduino Architektur über USB als serielle Schnittstelle (`USB ACM device`) erkannt wird. Die Schnittstelle wird nur sendend auf 9600 baud verwendet, wobei zum Senden auf die `stdio` von avr-libc zurückgegriffen wird.
-
-#### Positionsbestimmung
-% TODO
 
 # Literatur
 - LM-386 Verstärker http://www.ti.com/lit/ds/symlink/lm386.pdf
